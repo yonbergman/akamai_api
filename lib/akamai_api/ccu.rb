@@ -8,18 +8,20 @@ module AkamaiApi
 
     class << self
       [:invalidate, :remove].each do |action|
-        send :define_method, action do |type, items, args = {}|
+        send :define_method, action do |type, items|
+          args ||= {}
           purge action, type, items, args
         end
         [:arl, :cpcode].each do |type|
           method_name = "#{action}_#{type}".to_sym
-          send :define_method, method_name do |items, args = {}|
+          send :define_method, method_name do |items|
+            args ||= {}
             purge action, type, items, args
           end
         end
       end
 
-      def purge action, type, items, args = {}
+      def purge action, type, items, args
         validate_action action
         validate_type type
         options = ["action=#{action}", "type=#{type}"]
